@@ -4,11 +4,13 @@ import { graphql, useStaticQuery } from "gatsby";
 import Layout from "../components/layout";
 import Event from "../components/event";
 
-const EventTemplate = ({ data: { event } }) => (
-  <Layout>
-    <Event {...event} />
-  </Layout>
-);
+const EventTemplate = ({ data: { event } }) => {
+  return (
+    <Layout>
+      <Event {...event} />
+    </Layout>
+  );
+};
 
 export const query = graphql`
   query($eventID: String!) {

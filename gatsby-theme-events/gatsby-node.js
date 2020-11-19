@@ -48,48 +48,39 @@ exports.createResolvers = ({ createResolvers }) => {
 
 // query for events and create pages
 exports.createPages = async ({ actions, graphql, reporter }) => {
+  // 1. Set up the call to create the root page
   const basePath = "/";
   actions.createPage({
     path: basePath,
     component: require.resolve("./src/templates/events.js"),
   });
 
-  // query for events and create pages
-  exports.createPages = async ({ actions, graphql, reporter }) => {
-    // 1. Set up the call to create the root page
-    const basePath = "/";
-    actions.createPage({
-      path: basePath,
-      component: require.resolve("./src/templates/events.js"),
-    });
-
-    // 2. Query for events
-    const result = await graphql(`
-      query {
-        allEvent(sort: { fields: startDate, order: ASC }) {
-          nodes {
-            id
-            slug
-          }
+  // 2. Query for events
+  const result = await graphql(`
+    query {
+      allEvent(sort: { fields: startDate, order: ASC }) {
+        nodes {
+          id
+          slug
         }
       }
-    `);
-    if (result.errors) {
-      reporter.panic("error loading events", result.errors);
-      return;
     }
+  `);
+  if (result.errors) {
+    reporter.panic("error loading events", result.errors);
+    return;
+  }
 
-    // 3. Create a page for each event
-    const events = result.data.allEvent.nodes;
-    events.forEach((event) => {
-      const slug = event.slug;
-      actions.createPage({
-        path: slug,
-        component: require.resolve("./src/templates/event.js"),
-        context: {
-          eventID: event.id,
-        },
-      });
+  // 3. Create a page for each event
+  const events = result.data.allEvent.nodes;
+  events.forEach((event) => {
+    const slug = event.slug;
+    actions.createPage({
+      path: slug,
+      component: require.resolve("./src/templates/event.js"),
+      context: {
+        eventID: event.id,
+      },
     });
-  };
+  });
 };
