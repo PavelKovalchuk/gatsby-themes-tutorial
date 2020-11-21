@@ -1,8 +1,14 @@
 const fs = require("fs");
 
+/**
+ *
+ * In gatsby-node.js, the options that were added to the gatsby-config.js function
+ *  are provided as a second argument to Gatsby’s API hooks.
+ */
+
 // Make sure the data directory exists
-exports.onPreBootstrap = ({ reporter }) => {
-  const contentPath = "data";
+exports.onPreBootstrap = ({ reporter }, options) => {
+  const contentPath = options.contentPath || "data";
 
   if (!fs.existsSync(contentPath)) {
     reporter.info(`creating the ${contentPath} directory`);
@@ -26,8 +32,8 @@ exports.sourceNodes = ({ actions }) => {
 };
 
 // Define resolvers for custom fields
-exports.createResolvers = ({ createResolvers }) => {
-  const basePath = "/";
+exports.createResolvers = ({ createResolvers }, options) => {
+  const basePath = options.basePath || "/";
   // Quick-and-dirty helper to convert strings into URL-friendly slugs.
   const slugify = (str) => {
     const slug = str
@@ -47,9 +53,10 @@ exports.createResolvers = ({ createResolvers }) => {
 };
 
 // query for events and create pages
-exports.createPages = async ({ actions, graphql, reporter }) => {
+exports.createPages = async ({ actions, graphql, reporter }, options) => {
+  const basePath = options.basePath || "/";
+
   // 1. Set up the call to create the root page
-  const basePath = "/";
   actions.createPage({
     path: basePath,
     component: require.resolve("./src/templates/events.js"),
